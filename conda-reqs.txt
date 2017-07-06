@@ -1,0 +1,16 @@
+numpy
+scikit-learn
+Cython
+matplotlib
+seaborn
+bokeh
+pandas
+pyzmq
+requests
+SQLAlchemy
+virtualenv
+nltk
+lxml
+ipython-sql
+pandas-datareader
+beautifulsoup4
