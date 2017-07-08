@@ -1,0 +1,13 @@
+hdfs
+zipline
+sparkmagic
+ipywidgets==5.2.3
+envoy
+pytesseract
+pyocr
+zmq
+zerorpc
+implicit
+fastfm
+pyquery
+grab

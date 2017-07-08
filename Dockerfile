@@ -1,4 +1,4 @@
-FROM jupyter/scipy-notebook
+FROM jupyter/scipy-notebook:latest
 
 
 USER root
@@ -17,6 +17,8 @@ RUN apt-get update &&\
                        libjpeg-dev \
                        zlib1g-dev \
                        libpng12-dev \
+                       libpulse-dev \
+                       swig \
                        libx11-dev
 
 # R pre-requisites
@@ -150,17 +152,15 @@ RUN conda install --quiet --yes 'tensorflow=1.0*'
 # Install Python 2 Tensorflow
 RUN conda install --quiet --yes -n python2 'tensorflow=1.0*'
 
-ADD requirements.txt /home/jovyan/requirements.txt
-ADD conda-reqs.txt /home/jovyan/conda-reqs.txt
+ADD requirements/requirements.txt /home/jovyan/requirements.txt
+ADD requirements/conda-reqs.txt /home/jovyan/conda-reqs.txt
+ADD requirements/requirements3.txt /home/jovyan/requirements3.txt
+ADD requirements/conda-reqs3.txt /home/jovyan/conda-reqs3.txt
 
 # Install packages for python3
-RUN conda install --quiet --yes --file /home/jovyan/conda-reqs.txt &&\
-    python -m pip install -r /home/jovyan/requirements.txt &&\
+RUN conda install --quiet --yes --file /home/jovyan/conda-reqs3.txt &&\
+    python -m pip install -r /home/jovyan/requirements3.txt &&\
     python -m pip install newspaper3k
-
-USER root
-RUN apt-get update && apt-get install -y libx11-dev
-USER $NB_USER
 
 # Install packages for Python2
 RUN conda install --quiet --yes -n python2 --file /home/jovyan/conda-reqs.txt
@@ -169,11 +169,26 @@ RUN /bin/bash -c "source activate python2 \
     && pip install newspaper"
 
 RUN rm /home/jovyan/requirements.txt &&\
-    rm /home/jovyan/conda-reqs.txt
+    rm /home/jovyan/conda-reqs.txt &&\
+    rm /home/jovyan/requirements3.txt &&\
+    rm /home/jovyan/conda-reqs3.txt
 
 # Install NLTK Data
-RUN python3 -m nltk.downloader all
+# RUN python3 -m nltk.downloader all
 
+
+# Install lcapy for Python3
+RUN cd /home/jovyan &&\
+    git clone https://github.com/mph-/lcapy &&\
+    cd lcapy &&\
+    python setup.py install &&\
+# Now for Python2
+    /bin/bash -c "source activate python2 \
+    && python setup.py install"
+
+# Install PyTorch for Python2 and Python3
+RUN conda install pytorch torchvision --yes --quiet -c soumith  &&\
+    conda install pytorch torchvision --yes --quiet -n python2 -c soumith
 # Enable extensions
 RUN jupyter nbextension enable --py --sys-prefix widgetsnbextension 
 

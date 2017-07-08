@@ -1,0 +1,16 @@
+# lcapy
+http://lcapy.elec.canterbury.ac.nz/install.html#lcapy-installation-for-linux-ubuntu-and-variants
+
+#quameon (no setup in SVN)
+https://sourceforge.net/p/quameon/code/HEAD/tree/
+
+# For PyTorch add soumith channel to conda:
+```
+conda config --add channels soumith
+```
+
+
+#No support for Python 3
+- DateUtil
+- PDFMiner
+- 
