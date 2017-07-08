@@ -19,7 +19,15 @@ RUN apt-get update &&\
                        libpng12-dev \
                        libpulse-dev \
                        swig \
-                       libx11-dev
+                       libx11-dev \
+                       libtool \
+                       libffi-dev \
+                       ruby \
+                       ruby-dev \
+                       make \
+                       libzmq-dev \
+                       autoconf \
+                       pkg-config
 
 # R pre-requisites
 RUN apt-get install -y --no-install-recommends \
@@ -83,14 +91,22 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv E56151BF && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# Ruby Kernel
+RUN gem install cztop
+RUN cd /root &&\
+    git clone https://github.com/zeromq/czmq &&\
+    cd czmq &&\
+    ./autogen.sh &&\
+    ./configure &&\
+    make &&\
+    make install &&\
+    gem install iruby 
 
 # Spark and Mesos config
 ENV SPARK_HOME /usr/local/spark
 ENV PYTHONPATH $SPARK_HOME/python:$SPARK_HOME/python/lib/py4j-0.10.4-src.zip
 ENV MESOS_NATIVE_LIBRARY /usr/local/lib/libmesos.so
 ENV SPARK_OPTS --driver-java-options=-Xms1024M --driver-java-options=-Xmx4096M --driver-java-options=-Dlog4j.logLevel=info
-
-
 
 USER $NB_USER
 
@@ -217,6 +233,8 @@ RUN cd /home/jovyan/cling_2017-06-22_ubuntu14/share/cling/Jupyter/kernel &&\
     jupyter-kernelspec install --user cling-cpp14 &&\
     jupyter-kernelspec install --user cling-cpp11
 
+# Register Ruby Kernel
+RUN iruby register --force
 
 # Add RISE
 RUN cd /home/jovyan &&\
@@ -225,3 +243,4 @@ RUN cd /home/jovyan &&\
     cd RISE-master &&\
     python3 setup.py install
 
+WORKDIR /home/jovyan/work
